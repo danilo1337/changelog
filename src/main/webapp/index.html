@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="local-css.css">
+    <style>
+        .project {
+            display: none;
+        }
+
+        .project.show {
+        display: block;
+    }
+</style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-wrapper">
+                <a href="#" class="brand-logo center">Changelog</a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Últimas Alterações dos Projetos</h2>
+            <div class="row">
+                <div class="col s12">
+                    <div class="input-field">
+                        <input type="text" id="search-bar" onkeyup="searchProjects()" placeholder="Pesquisar projetos">
+                    </div>
+                </div>
+            </div>
+            <ul id="project-list" class="collection"></ul>
+        </div>
+    </main>
+    
+    <footer class="page-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+                    <p>&copy; 2023 Danilo Ribeiro. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        function showProjects() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var projects = JSON.parse(this.responseText).projects;
+                    var projectList = document.getElementById("project-list");
+    
+                    for (var i = 0; i < projects.length; i++) {
+                        var project = projects[i];
+                        var projectElement = document.createElement("li");
+                        projectElement.id = "project-" + i;
+                        projectElement.className = "collection-item project";
+    
+                        var iconElement = document.createElement("i");
+                        iconElement.className = "fas " + project.icon;
+                        iconElement.style.color = project.iconColor;
+                        projectElement.appendChild(iconElement);
+    
+                        var nameElement = document.createElement("a");
+                        nameElement.href = project.url;
+                        nameElement.textContent = project.name;
+                        projectElement.appendChild(nameElement);
+
+                        var description = document.createElement("description");
+                        // description.style.whiteSpace = "pre-wrap";
+                        description.className = "description";
+                        description.textContent = project.description;
+                        projectElement.appendChild(description);
+    
+                        var updatedElement = document.createElement("span");
+                        updatedElement.className = "last-updated";
+                        updatedElement.textContent = "Última atualização em " + project.lastUpdated;
+                        projectElement.appendChild(updatedElement);
+    
+                        projectList.appendChild(projectElement);
+                    }
+                }
+            };
+            xmlhttp.open("GET", "http://localhost:8080/projects", true);
+            xmlhttp.send();
+        }
+    
+        function searchProjects() {
+            var searchText = document.getElementById("search-bar").value.toLowerCase();
+            var projects = document.querySelectorAll(".project");
+    
+            for (var i = 0; i < projects.length; i++) {
+                var projectName = projects[i].querySelector("a").textContent.toLowerCase();
+    
+                if (projectName.indexOf(searchText) > -1) {
+                    projects[i].classList.add("show");
+                } else {
+                    projects[i].classList.remove("show");
+                }
+            }
+        }
+    
+        showProjects();
+    </script>
+    </body>
+</html>
+    
